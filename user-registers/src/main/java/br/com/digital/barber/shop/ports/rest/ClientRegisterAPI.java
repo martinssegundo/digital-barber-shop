@@ -36,8 +36,7 @@ public class ClientRegisterAPI {
         return clientUsercase.testeClient(client.getName())
                 .map(item -> Response.status(201).build())
                 .onFailure()
-                .invoke(error -> log.error(error.getLocalizedMessage()))
-                .replaceWith(item -> Response.status(HttpStatus.SC_METHOD_FAILURE))
+                .recoverWithItem(Response.status(HttpStatus.SC_NO_CONTENT).build());
     }
 
     @GET

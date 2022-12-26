@@ -1,10 +1,16 @@
 package br.com.digital.barber.shop.domain.usercases.mocks;
 
 import br.com.digital.barber.shop.domain.usercases.ClientUsercaseTest;
+import br.com.digital.barber.shop.util.JsonReader;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+import org.apache.http.HttpStatus;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 
@@ -18,31 +24,34 @@ public class WiremockClientData implements QuarkusTestResourceLifecycleManager {
     public Map<String, String> start() {
         wireMOckServer = new WireMockServer();
         wireMOckServer.start();
-        String json;
-        var loader = ClientUsercaseTest.class.getClassLoader().getSystemClassLoader();
-        try {
-            json = new String(
-                    loader.getResourceAsStream("jsons/testeoud.json").readAllBytes()
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        configSucess();
+        configError();
+
+        return Collections.singletonMap("br.com.digital.barber.shop.ports.clients.ClientDataTest/mp-rest/url", wireMOckServer.baseUrl());
+    }
+
+    private void configSucess(){
+        String json= JsonReader.getJson();
         stubFor(
-                get(urlEqualTo("/extensions"))
-                .willReturn(
-                        aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withBody(json)
-                )
-        );
-        stubFor(
-                get(urlMatching(".*"))
-                        .atPriority(10)
+                get(urlPathMatching("/teste/Luiz"))
                         .willReturn(
-                                aResponse().proxiedFrom("http://teste.com")
+                                okJson(json)
                         )
         );
-        return Collections.singletonMap("br.com.digital.barber.shop.ports.clients.ClientDataTest/mp-rest/url", wireMOckServer.baseUrl());
+    }
+
+
+    private void configError(){
+        String json = JsonReader.getJsonError();
+        stubFor(
+                get(urlEqualTo("/teste/Luiz2"))
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withStatus(HttpStatus.SC_CONFLICT)
+                                        .withBody(json)
+                        )
+        );
     }
 
     @Override

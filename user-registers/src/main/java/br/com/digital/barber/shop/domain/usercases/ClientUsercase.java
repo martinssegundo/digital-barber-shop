@@ -23,13 +23,14 @@ public class ClientUsercase {
 
     public Uni<ClientDTO> testeClient(String test){
         return clientDataTest.testeClient(test)
-                .map(response -> createClient(test))
+                .map(client -> createClient(client))
                 .onFailure()
                 .invoke(error -> log.error(error.getMessage()));
     }
 
 
     private ClientDTO createClient(String test){
+        log.info("Criando um cliente para add");
         var client = new ClientDTO();
         client.setName(test);
         return client;

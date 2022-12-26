@@ -2,6 +2,7 @@ package br.com.digital.barber.shop.ports.rest;
 
 import br.com.digital.barber.shop.domain.usercases.ClientUsercaseTest;
 import br.com.digital.barber.shop.domain.usercases.mocks.WiremockClientData;
+import br.com.digital.barber.shop.util.JsonReader;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -21,10 +22,21 @@ class ClientRegisterAPITest {
 
         given()
                 .contentType(ContentType.JSON)
-                .body(getJson())
+                .body(JsonReader.getJson())
                 .when().post("client/v1/new")
                 .then()
                 .statusCode(HttpStatus.CREATED_201);
+    }
+
+    @Test
+    void testSaveError() {
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(JsonReader.getJsonError())
+                .when().post("client/v1/new")
+                .then()
+                .statusCode(org.apache.http.HttpStatus.SC_NO_CONTENT);
     }
 
     //@Test
@@ -34,18 +46,7 @@ class ClientRegisterAPITest {
 
 
 
-    private String getJson(){
-        String json;
-        var loader = ClientUsercaseTest.class.getClassLoader().getSystemClassLoader();
-        try {
-            json = new String(
-                    loader.getResourceAsStream("jsons/testeoud.json").readAllBytes()
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return json;
-    }
+
 }
 
 //Generated with love by TestMe :) Please report issues and submit feature requests at: http://weirddev.com/forum#!/testme

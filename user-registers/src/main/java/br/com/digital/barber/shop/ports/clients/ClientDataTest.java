@@ -10,10 +10,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-@Path("/extensions")
+@Path("/teste")
 @RegisterRestClient
 public interface ClientDataTest {
 
     @GET
-    Uni<TesteDTO> testeClient(@PathParam("data") String data);
+    @Path("/{data}")
+    Uni<String> testeClient(@PathParam("data") String data);
 }
